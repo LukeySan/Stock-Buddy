@@ -32,7 +32,50 @@ function StockRiskCalculator() {
   const [principleFund, setPrincipleFund] = useState("");
   const [result, setResult] = useState(null);
   const [explanation, setExplanation] = useState(null);
+  const [portfolio, setPortfolio] = useState({});
+  const [portfolioResult, setPortfolioResult] = useState(null);
+  const [portfolioExplanation, setPortfolioExplanation] = useState(null);
   const navigate = useNavigate();
+
+  const handleAddToPortfolio = () => {
+    if (!stockSymbol || !principleFund) {
+      alert("Please select a stock and enter principle fund");
+      return;
+    }
+
+    setPortfolio((prev) => ({
+      ...prev,
+      [stockSymbol]: parseFloat(principleFund),
+    }));
+
+    // Clear inputs after adding
+    setStockSymbol("");
+    setPrincipleFund("");
+    setSearchTerm("");
+    setSelectedCompany(null);
+  };
+  const handleAnalyzePortfolio = async () => {
+    if (Object.keys(portfolio).length < 2) {
+      alert("Please add at least 2 stocks to analyze portfolio");
+      return;
+    }
+
+    try {
+      const response = await api.post(
+        "/api/calculate-portfolio-analysis/",
+        portfolio
+      );
+      setPortfolioResult(response.data);
+
+      const explanationResponse = await api.post(
+        "/api/get-portfolio-analysis/",
+        response.data
+      );
+      setPortfolioExplanation(explanationResponse.data.explanation);
+    } catch (error) {
+      console.error("Error analyzing portfolio:", error);
+    }
+  };
 
   useEffect(() => {
     // Fetch CSRF token when component mounts
@@ -188,6 +231,64 @@ function StockRiskCalculator() {
             <p>Explanation: {explanation}</p>
           </div>
         )}
+        <div className="portfolio-section">
+          <h2>Portfolio Analysis</h2>
+          <button onClick={handleAddToPortfolio}>Add to Portfolio</button>
+
+          {Object.keys(portfolio).length > 0 && (
+            <div className="portfolio-status">
+              <h3>Current Portfolio:</h3>
+              {Object.entries(portfolio).map(([symbol, amount]) => (
+                <p key={symbol}>
+                  {symbol}: ${amount}
+                </p>
+              ))}
+              {Object.keys(portfolio).length >= 2 && (
+                <button onClick={handleAnalyzePortfolio}>
+                  Analyze Portfolio
+                </button>
+              )}
+            </div>
+          )}
+
+          {portfolioResult && (
+            <div className="portfolio-results">
+              <h3>Portfolio Analysis Results:</h3>
+              <p>
+                Portfolio Risk:{" "}
+                {(
+                  portfolioResult.portfolio_risk[
+                    "Total Portfolio Volatility (Risk)"
+                  ] * 100
+                ).toFixed(2)}
+                %
+              </p>
+              <p>
+                5% Worst Case Value: $
+                {portfolioResult.portfolio_risk[
+                  "5% Worst Case Scenario (Monte Carlo)"
+                ].toFixed(2)}
+              </p>
+              <p>
+                Total Investment: ${portfolioResult.total_investment.toFixed(2)}
+              </p>
+              <h4>Portfolio Weights:</h4>
+              {Object.entries(portfolioResult.weights).map(
+                ([symbol, weight]) => (
+                  <p key={symbol}>
+                    {symbol}: {(weight * 100).toFixed(2)}%
+                  </p>
+                )
+              )}
+              {portfolioExplanation && (
+                <div className="portfolio-explanation">
+                  <h4>Analysis:</h4>
+                  <p>{portfolioExplanation}</p>
+                </div>
+              )}
+            </div>
+          )}
+        </div>
       </motion.div>
     </div>
   );

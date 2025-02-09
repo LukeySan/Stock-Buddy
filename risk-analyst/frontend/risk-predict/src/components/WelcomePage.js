@@ -1,35 +1,48 @@
-import React from "react";
+import React, { useState } from "react";
 import { motion } from "framer-motion";
 import { useNavigate } from "react-router-dom";
 import "../styles/WelcomePage.css";
+import GraphAnimation from "./GraphAnimation";
 
 function WelcomePage() {
   const navigate = useNavigate();
+  const [isAnimating, setIsAnimating] = useState(false);
 
   const handleClick = () => {
-    navigate("/calculator");
+    setIsAnimating(true);
+    setTimeout(() => {
+      navigate("/calculator");
+    }, 2000); // Wait for animation to complete before navigating
   };
 
   return (
-    <div className="welcome-container">
+    <>
+      <GraphAnimation isAnimating={isAnimating} />
       <motion.div
-        className="animated-square"
-        animate={{ scale: [1, 1.5, 1] }}
-        transition={{ duration: 2, repeat: Infinity }}
-      />
-      <div>
-        <h1>Welcome</h1>
-        <p>Integrate our API for comprehensive analytics.</p>
-        <motion.button
-          className="connect-button"
-          onClick={handleClick}
-          whileHover={{ scale: 1.1 }}
-          whileTap={{ scale: 0.9 }}
+        className="welcome-container"
+        initial={{ opacity: 1 }}
+        exit={{ opacity: 0 }}
+        transition={{ duration: 0.5 }}
+      >
+        <motion.div
+          initial={{ y: 20, opacity: 0 }}
+          animate={{ y: 0, opacity: 1 }}
+          transition={{ delay: 0.2 }}
         >
-          Let's get started
-        </motion.button>
-      </div>
-    </div>
+          <h1>Welcome</h1>
+          <p>Integrate our API for comprehensive analytics.</p>
+          <motion.button
+            className="connect-button"
+            onClick={handleClick}
+            whileHover={{ scale: 1.1 }}
+            whileTap={{ scale: 0.9 }}
+            disabled={isAnimating}
+          >
+            Let's get started
+          </motion.button>
+        </motion.div>
+      </motion.div>
+    </>
   );
 }
 

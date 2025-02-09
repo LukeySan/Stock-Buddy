@@ -7,6 +7,8 @@ import { useNavigate } from "react-router-dom";
 import "../styles/StockRiskCalculator.css";
 import Fuse from "fuse.js";
 import api, { fetchCSRFToken } from "./api";
+import FinanceBackground from './FinanceBackground';
+import '../styles/FinanceBackground.css';
 
 function StockRiskCalculator() {
   const [companies, setCompanies] = useState([]);
@@ -107,6 +109,7 @@ function StockRiskCalculator() {
 
   return (
     <div className="calculator-container">
+      <FinanceBackground />
       <motion.button
         onClick={() => navigate("/")}
         className="back-button"

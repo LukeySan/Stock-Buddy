@@ -54,22 +54,7 @@ function StockRiskCalculator() {
     setResults([]); // Clear the results
   };
 
-  function getCookie(name) {
-    let cookieValue = null;
-    if (document.cookie && document.cookie !== "") {
-      const cookies = document.cookie.split(";");
-      for (let i = 0; i < cookies.length; i++) {
-        const cookie = cookies[i].trim();
-        if (cookie.substring(0, name.length + 1) === name + "=") {
-          cookieValue = decodeURIComponent(cookie.substring(name.length + 1));
-          break;
-        }
-      }
-    }
-    return cookieValue;
-  }
-
-  const handleGenerateExplanation = async () => {
+  /*const handleGenerateExplanation = async () => {
     try {
       const response = await api.post("/api/get-explanation/", {
         stock_symbol: stockSymbol,
@@ -84,7 +69,7 @@ function StockRiskCalculator() {
     } catch (error) {
       console.error("Error generating explanation:", error);
     }
-  };
+  };*/
 
   const handleCalculateRisk = async () => {
     try {

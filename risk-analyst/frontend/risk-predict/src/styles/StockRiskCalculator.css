@@ -87,12 +87,35 @@ button:hover {
 .results h2 {
   color: #00c6ff;
   margin-bottom: 15px;
+  font-size: 1.5rem;
 }
 
 .results p {
   color: #fff;
   margin-bottom: 10px;
   font-size: 1.1rem;
+}
+
+/* Add a separate container for the explanation */
+.results .explanation {
+  margin-top: 20px;
+  padding: 20px;
+  background: rgba(255, 255, 255, 0.1);
+  border-radius: 12px;
+  border-left: 4px solid #00c6ff;
+}
+
+.results .explanation h4 {
+  color: #00c6ff;
+  margin-bottom: 15px;
+  font-size: 1.2rem;
+}
+
+.results .explanation p {
+  color: #fff;
+  margin-bottom: 10px;
+  font-size: 1.1rem;
+  line-height: 1.5;
 }
 
 /* Custom Scrollbar */
@@ -168,27 +191,49 @@ button:hover {
 .portfolio-section {
   margin-top: 40px;
   padding-top: 20px;
-  border-top: 2px solid #eee;
+  border-top: 2px solid rgba(255, 255, 255, 0.1);
 }
 
-.portfolio-status {
-  margin: 20px 0;
-  padding: 15px;
-  background: #f5f5f5;
-  border-radius: 8px;
-}
-
+.portfolio-status,
 .portfolio-results {
-  margin-top: 20px;
+  margin-top: 30px;
   padding: 20px;
-  background: #f8f9fa;
-  border-radius: 8px;
-  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+  background: rgba(255, 255, 255, 0.1);
+  border-radius: 12px;
+}
+
+.portfolio-status h3,
+.portfolio-results h3,
+.portfolio-results h4 {
+  color: #00c6ff;
+  margin-bottom: 15px;
+  font-size: 1.5rem;
+}
+
+.portfolio-status p,
+.portfolio-results p {
+  color: #fff;
+  margin-bottom: 10px;
+  font-size: 1.1rem;
 }
 
 .portfolio-explanation {
   margin-top: 20px;
-  padding: 15px;
-  background: #fff;
-  border-left: 4px solid #007bff;
+  padding: 20px;
+  background: rgba(255, 255, 255, 0.1);
+  border-radius: 12px;
+  border-left: 4px solid #00c6ff;
+}
+
+.portfolio-explanation h4 {
+  color: #00c6ff;
+  margin-bottom: 15px;
+  font-size: 1.2rem;
+}
+
+.portfolio-explanation p {
+  color: #fff;
+  margin-bottom: 10px;
+  font-size: 1.1rem;
+  line-height: 1.5;
 }

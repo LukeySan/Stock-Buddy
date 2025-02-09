@@ -228,9 +228,16 @@ function StockRiskCalculator() {
             <p>Max Return: ${result.max_return_dollar}</p>
             <p>Max Loss: ${result.max_loss_dollar}</p>
             <p>Value at Risk: {result["5% worst-case scenario"]}%</p>
-            <p>Explanation: {explanation}</p>
+
+            {explanation && (
+              <div className="explanation">
+                <h4>AI Analysis:</h4>
+                <p>{explanation}</p>
+              </div>
+            )}
           </div>
         )}
+
         <div className="portfolio-section">
           <h2>Portfolio Analysis</h2>
           <button onClick={handleAddToPortfolio}>Add to Portfolio</button>
@@ -282,7 +289,7 @@ function StockRiskCalculator() {
               )}
               {portfolioExplanation && (
                 <div className="portfolio-explanation">
-                  <h4>Analysis:</h4>
+                  <h4>AI Analysis:</h4>
                   <p>{portfolioExplanation}</p>
                 </div>
               )}

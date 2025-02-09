@@ -35,6 +35,13 @@ function StockRiskCalculator() {
   const [portfolio, setPortfolio] = useState({});
   const [portfolioResult, setPortfolioResult] = useState(null);
   const [portfolioExplanation, setPortfolioExplanation] = useState(null);
+  const [portfolioSearchTerm, setPortfolioSearchTerm] = useState("");
+  const [portfolioStockSymbol, setPortfolioStockSymbol] = useState("");
+  const [portfolioPrincipleFund, setPortfolioPrincipleFund] = useState("");
+  const [portfolioSelectedCompany, setPortfolioSelectedCompany] =
+    useState(null);
+  const [mainSearchResults, setMainSearchResults] = useState([]);
+  const [portfolioSearchResults, setPortfolioSearchResults] = useState([]);
   const navigate = useNavigate();
 
   const handleAddToPortfolio = () => {
@@ -96,22 +103,44 @@ function StockRiskCalculator() {
   }, []);
 
   useEffect(() => {
-    if (searchTerm.length >= 2 && companies.length > 0) {
+    if (searchTerm.length >= 1 && companies.length > 0) {
       const fuse = new Fuse(companies, {
         keys: ["Security", "Symbol"],
-        threshold: 0.0, // Make the match exact
-        distance: 0, // Don't allow character distance
-        minMatchCharLength: 2,
+        threshold: 0.0,
+        distance: 0,
+        minMatchCharLength: 1,
         includeScore: true,
-        useExtendedSearch: true, // Enable extended search
+        useExtendedSearch: true,
       });
 
       const searchResults = fuse.search(searchTerm);
-      setResults(searchResults.map((result) => result.item).slice(0, 8));
+      setMainSearchResults(
+        searchResults.map((result) => result.item).slice(0, 8)
+      );
     } else {
-      setResults([]);
+      setMainSearchResults([]);
     }
   }, [searchTerm, companies]);
+
+  useEffect(() => {
+    if (portfolioSearchTerm.length >= 1 && companies.length > 0) {
+      const fuse = new Fuse(companies, {
+        keys: ["Security", "Symbol"],
+        threshold: 0.0,
+        distance: 0,
+        minMatchCharLength: 1,
+        includeScore: true,
+        useExtendedSearch: true,
+      });
+
+      const searchResults = fuse.search(portfolioSearchTerm);
+      setPortfolioSearchResults(
+        searchResults.map((result) => result.item).slice(0, 8)
+      );
+    } else {
+      setPortfolioSearchResults([]);
+    }
+  }, [portfolioSearchTerm, companies]);
 
   useEffect(() => {
     if (result) {
@@ -168,7 +197,7 @@ function StockRiskCalculator() {
   return (
     <div className="calculator-container">
       <div className="top-bar">
-        <motion.div 
+        <motion.div
           className="top-bar-title"
           onClick={() => navigate("/")}
           whileHover={{ x: -2 }}
@@ -196,13 +225,12 @@ function StockRiskCalculator() {
             value={searchTerm}
             onChange={(e) => setSearchTerm(e.target.value)}
             onBlur={() => {
-              // Small delay to allow click event to fire first
-              setTimeout(() => setResults([]), 200);
+              setTimeout(() => setMainSearchResults([]), 200);
             }}
           />
-          {results.length > 0 && (
+          {mainSearchResults.length > 0 && (
             <ul className="search-results">
-              {results.map((company) => (
+              {mainSearchResults.map((company) => (
                 <li
                   key={company.Symbol}
                   onClick={() => handleSelectCompany(company)}
@@ -241,7 +269,63 @@ function StockRiskCalculator() {
 
         <div className="portfolio-section">
           <h2>Portfolio Analysis</h2>
-          <button onClick={handleAddToPortfolio}>Add to Portfolio</button>
+
+          <div className="search-container">
+            <input
+              type="text"
+              placeholder="Search company or symbol for portfolio"
+              value={portfolioSearchTerm}
+              onChange={(e) => setPortfolioSearchTerm(e.target.value)}
+              onBlur={() => {
+                setTimeout(() => setPortfolioSearchResults([]), 200);
+              }}
+            />
+            {portfolioSearchResults.length > 0 && (
+              <ul className="search-results">
+                {portfolioSearchResults.map((company) => (
+                  <li
+                    key={company.Symbol}
+                    onClick={() => {
+                      setPortfolioSelectedCompany(company);
+                      setPortfolioStockSymbol(company.Symbol);
+                      setPortfolioSearchTerm(company.Symbol);
+                    }}
+                  >
+                    <span className="company-name">{company.Security}</span>
+                    <span className="company-symbol">({company.Symbol})</span>
+                  </li>
+                ))}
+              </ul>
+            )}
+          </div>
+
+          <input
+            type="number"
+            value={portfolioPrincipleFund}
+            onChange={(e) => setPortfolioPrincipleFund(e.target.value)}
+            placeholder="Enter principle fund for portfolio"
+          />
+
+          <button
+            onClick={() => {
+              if (!portfolioStockSymbol || !portfolioPrincipleFund) {
+                alert(
+                  "Please select a stock and enter principle fund for portfolio"
+                );
+                return;
+              }
+              setPortfolio((prev) => ({
+                ...prev,
+                [portfolioStockSymbol]: parseFloat(portfolioPrincipleFund),
+              }));
+              setPortfolioStockSymbol("");
+              setPortfolioPrincipleFund("");
+              setPortfolioSearchTerm("");
+              setPortfolioSelectedCompany(null);
+            }}
+          >
+            Add to Portfolio
+          </button>
 
           {Object.keys(portfolio).length > 0 && (
             <div className="portfolio-status">

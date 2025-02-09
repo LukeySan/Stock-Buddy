@@ -42,7 +42,7 @@ function StockRiskCalculator() {
   useEffect(() => {
     const fetchCompanies = async () => {
       try {
-        const response = await axios.get("/api/sp500/names"); // Adjust the endpoint as needed
+        const response = await axios.get("/sp500_companies.json");
         setCompanies(response.data);
       } catch (error) {
         console.error("Error fetching companies:", error);
@@ -53,13 +53,20 @@ function StockRiskCalculator() {
   }, []);
 
   useEffect(() => {
-    const fuse = new Fuse(companies, {
-      keys: ["Security", "Symbol"], // Search in company names
-      includeScore: true,
-    });
+    if (searchTerm.length >= 2 && companies.length > 0) {
+      const fuse = new Fuse(companies, {
+        keys: ["Security", "Symbol"],
+        threshold: 0.3,
+        distance: 100,
+        minMatchCharLength: 2,
+        includeScore: true,
+      });
 
-    const results = fuse.search(searchTerm);
-    setResults(results.map((result) => result.item)); // Extract matched items
+      const searchResults = fuse.search(searchTerm);
+      setResults(searchResults.map(result => result.item).slice(0, 8));
+    } else {
+      setResults([]);
+    }
   }, [searchTerm, companies]);
 
   useEffect(() => {
@@ -70,9 +77,9 @@ function StockRiskCalculator() {
 
   const handleSelectCompany = (company) => {
     setSelectedCompany(company);
-    setStockSymbol(company.Symbol); // Set the stock symbol based on the selected company
-    setSearchTerm(company.Security); // Update the search term to the selected company name
-    setResults([]); // Clear the results
+    setStockSymbol(company.Symbol);
+    setSearchTerm(company.Symbol);
+    setResults([]);
   };
 
   function getCookie(name) {
@@ -134,30 +141,36 @@ function StockRiskCalculator() {
       </motion.button>
       <motion.div
         className="calculator-content"
-        variants={contentVariants}
-        initial="hidden"
-        animate="visible"
-        exit="exit"
+        initial={{ opacity: 0, scale: 0.8 }}
+        animate={{ opacity: 1, scale: 1 }}
+        exit={{ opacity: 0, scale: 0.8 }}
+        transition={{ 
+          duration: 1,
+          ease: [0.43, 0.13, 0.23, 0.96] // Custom easing for a nice pop effect
+        }}
       >
         <h1>Stock Risk Calculator</h1>
-        <input
-          type="text"
-          placeholder="Search company or symbol"
-          value={searchTerm}
-          onChange={(e) => setSearchTerm(e.target.value)}
-        />
-        {results.length > 0 && (
-          <ul>
-            {results.map((company) => (
-              <li
-                key={company.Symbol}
-                onClick={() => handleSelectCompany(company)}
-              >
-                {company.Security} ({company.Symbol})
-              </li>
-            ))}
-          </ul>
-        )}
+        <div className="search-container">
+          <input
+            type="text"
+            placeholder="Search company or symbol"
+            value={searchTerm}
+            onChange={(e) => setSearchTerm(e.target.value)}
+          />
+          {results.length > 0 && (
+            <ul className="search-results">
+              {results.map((company) => (
+                <li
+                  key={company.Symbol}
+                  onClick={() => handleSelectCompany(company)}
+                >
+                  <span className="company-name">{company.Security}</span>
+                  <span className="company-symbol">({company.Symbol})</span>
+                </li>
+              ))}
+            </ul>
+          )}
+        </div>
         <input
           type="number"
           value={principleFund}

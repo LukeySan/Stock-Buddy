@@ -7,20 +7,20 @@ import { useNavigate } from "react-router-dom";
 import "../styles/StockRiskCalculator.css";
 import Fuse from "fuse.js";
 import api, { fetchCSRFToken } from "./api";
-import FinanceBackground from './FinanceBackground';
-import '../styles/FinanceBackground.css';
+import FinanceBackground from "./FinanceBackground";
+import "../styles/FinanceBackground.css";
 
 const contentVariants = {
   hidden: { opacity: 0, scale: 0.8 },
-  visible: { 
-    opacity: 1, 
+  visible: {
+    opacity: 1,
     scale: 1,
     transition: {
       duration: 1,
-      ease: [0.43, 0.13, 0.23, 0.96]
-    }
+      ease: [0.43, 0.13, 0.23, 0.96],
+    },
   },
-  exit: { opacity: 0, scale: 0.8 }
+  exit: { opacity: 0, scale: 0.8 },
 };
 
 function StockRiskCalculator() {
@@ -56,15 +56,15 @@ function StockRiskCalculator() {
     if (searchTerm.length >= 2 && companies.length > 0) {
       const fuse = new Fuse(companies, {
         keys: ["Security", "Symbol"],
-        threshold: 0.0,  // Make the match exact
-        distance: 0,     // Don't allow character distance
+        threshold: 0.0, // Make the match exact
+        distance: 0, // Don't allow character distance
         minMatchCharLength: 2,
         includeScore: true,
-        useExtendedSearch: true  // Enable extended search
+        useExtendedSearch: true, // Enable extended search
       });
 
       const searchResults = fuse.search(searchTerm);
-      setResults(searchResults.map(result => result.item).slice(0, 8));
+      setResults(searchResults.map((result) => result.item).slice(0, 8));
     } else {
       setResults([]);
     }
@@ -72,7 +72,7 @@ function StockRiskCalculator() {
 
   useEffect(() => {
     if (result) {
-      handleGenerateExplanation();
+      //handleGenerateExplanation();
     }
   }, [result]);
 
@@ -109,6 +109,7 @@ function StockRiskCalculator() {
       setResult(response.data);
       const explanationResponse = await api.post("/api/get-explanation/", {
         stock_symbol: stockSymbol,
+        company_name: selectedCompany,
         principle_fund: parseFloat(principleFund),
         risk: response.data.risk,
         max_return_dollar: response.data.max_return_dollar,
@@ -138,9 +139,9 @@ function StockRiskCalculator() {
         initial={{ opacity: 0, scale: 0.8 }}
         animate={{ opacity: 1, scale: 1 }}
         exit={{ opacity: 0, scale: 0.8 }}
-        transition={{ 
+        transition={{
           duration: 1,
-          ease: [0.43, 0.13, 0.23, 0.96] // Custom easing for a nice pop effect
+          ease: [0.43, 0.13, 0.23, 0.96], // Custom easing for a nice pop effect
         }}
       >
         <h1>Stock Risk Calculator</h1>
@@ -175,9 +176,7 @@ function StockRiskCalculator() {
           onChange={(e) => setPrincipleFund(e.target.value)}
           placeholder="Enter principle fund"
         />
-        <button onClick={handleCalculateRisk}>
-          Calculate Risk
-        </button>
+        <button onClick={handleCalculateRisk}>Calculate Risk</button>
 
         {result && (
           <div className="results">

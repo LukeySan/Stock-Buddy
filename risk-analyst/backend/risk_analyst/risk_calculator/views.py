@@ -65,7 +65,7 @@ Your response should include:
 5. **Investor Suitability:** Identify what type of investor would benefit most from this stock, based on the risk/reward profile.
 6. **Risk Management Recommendations:** Offer specific strategies (e.g., diversification, stop-loss orders, portfolio allocation) to manage potential losses.
 
-Your response must be **concise (max 300 words), structured in one paragraph, and free from greetings or follow-up questions**. Do not use any emojis. Ensure your analysis is precise and actionable, avoiding vague statements."""
+Your response must be **concise (max 300 words), structured in one paragraph, and free from greetings or follow-up questions**. Do not use any emojis. Ensure your analysis is precise and actionable, avoiding vague statements. In your response make sure you address the stock symbol by its company name."""
             messages = [{"role": "system", "content": prompt}]
             
             
@@ -76,6 +76,7 @@ Your response must be **concise (max 300 words), structured in one paragraph, an
             Risk: {data.get('risk')}
             Max Return: {data.get('max_return_dollar')}
             Max Loss: {data.get('max_loss_dollar')}
+            Company Name: {data.get('company_name')}
             5% Worst Case Scenario (Calculated from Monte Carlo Simulation): {data.get('5% worst-case scenario')}
             """)
             messages.append({"role": "user", "content": prompt})

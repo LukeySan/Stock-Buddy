@@ -23,9 +23,12 @@ openai.api_key = os.getenv("OPENAI_API_KEY")
 class GetExplanationView(View):
     def post(self, request):
         try:
-            messages = [{"role": "system", "content": " You are a professional value trading consultant bot that evaluates an investment takeaway based on the data provided in the prompt. The prompt will have data that includes a percent decimal risk of investing in that stock, the max return in dollars, max loss in dollars, the return percentage in the worst 5 percent of simulated cases, the stock symbol and the prinicple fund that the user inputed. In your response cannot be more than 300 words. Your response should be formatted as just one paragraph and you must not greet the user, or have any follow up questoins after your evaluation. You must not use any emojis in your response."}]
+            prompt = "You are a professional value trading consultant bot that evaluates an investment takeaway based on the data provided in the prompt. "
+            "The prompt will have data that includes a percent risk of investing in that stock, the max return in dollars, max loss in dollars, the return percentage in the worst 5 percent of simulated cases, the stock symbol and the prinicple fund that the user inputed." 
+            "In your response cannot be more than 300 words. Your response should be formatted as just one paragraph and you must not greet the user, or have any follow up questoins after your evaluation. You must not use any emojis in your response."
+            messages = [{"role": "system", "content": prompt}]
             
-            prompt = "Evaluate an investment takeaway based on the data provided in this JSON data"
+            
             data = json.loads(request.body)
             prompt += (f"""
             Stock Symbol: {data.get('stock_symbol')}
@@ -36,6 +39,15 @@ class GetExplanationView(View):
             5% Worst Case Scenario (Calculated from Monte Carlo Simulation): {data.get('5% worst-case scenario')}
             """)
             messages.append({"role": "user", "content": prompt})
+
+            response = openai.ChatCompletion.create(
+                model = "gpt-3.5-turbo",
+                messages = messages,
+                max_tokens = 300,
+                temperature = 0.5
+            )
+            explanation = response["choices"][0]["message"]["content"].strip()
+            return JsonResponse({'explanation': explanation})
           
         except Exception as e:
             return JsonResponse({'error': str(e)}, status=400)

@@ -71,7 +71,7 @@ function StockRiskCalculator() {
 
   const handleGenerateExplanation = async () => {
     try {
-      const response = await api.post("/api/generate-explanation/", {
+      const response = await api.post("/api/get-explanation/", {
         stock_symbol: stockSymbol,
         principle_fund: parseFloat(principleFund),
         risk: result.risk,
@@ -80,7 +80,7 @@ function StockRiskCalculator() {
         "5% worst-case scenario": result["5% worst-case scenario"],
       });
 
-      setExplanation(response.data);
+      setExplanation(response.data.explanation);
     } catch (error) {
       console.error("Error generating explanation:", error);
     }
@@ -94,6 +94,7 @@ function StockRiskCalculator() {
       });
 
       setResult(response.data);
+      handleGenerateExplanation(result);
     } catch (error) {
       console.error("Error calculating risk:", error);
     }

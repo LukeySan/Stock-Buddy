@@ -1,8 +1,16 @@
-import React from "react";
+import React, { useMemo } from "react";
 import { motion } from "framer-motion";
 
 function FinanceBackground() {
   const symbols = ["$", "₿", "€", "£", "¥", "₹"];
+  
+  const symbolPositions = useMemo(() => 
+    symbols.map(() => ({
+      left: `${Math.random() * 100}%`,
+      top: `${Math.random() * 100}%`,
+    })), 
+    [] // Empty dependency array means this will only calculate once
+  );
 
   return (
     <div className="finance-background">
@@ -20,10 +28,7 @@ function FinanceBackground() {
             repeat: Infinity,
             delay: i * 0.5,
           }}
-          style={{
-            left: `${Math.random() * 100}%`,
-            top: `${Math.random() * 100}%`,
-          }}
+          style={symbolPositions[i]}
         >
           {symbol}
         </motion.div>

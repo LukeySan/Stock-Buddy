@@ -120,3 +120,47 @@ button:hover {
   scrollbar-width: thin;
   scrollbar-color: #00c6ff rgba(255, 255, 255, 0.1);
 }
+
+.search-container {
+  position: relative;
+  width: 100%;
+  margin-bottom: 20px;
+}
+
+.search-results {
+  position: absolute;
+  top: 100%;
+  left: 0;
+  right: 0;
+  background: rgba(26, 26, 26, 0.95);
+  border: 1px solid rgba(255, 255, 255, 0.1);
+  border-radius: 8px;
+  max-height: 200px;
+  overflow-y: auto;
+  z-index: 1000;
+  margin: 0;
+  padding: 0;
+}
+
+.search-results li {
+  padding: 12px;
+  cursor: pointer;
+  transition: all 0.2s ease;
+  list-style: none;
+  text-align: left;
+}
+
+.search-results li:hover {
+  background: rgba(0, 198, 255, 0.1);
+}
+
+.company-name {
+  color: #fff;
+  display: inline-block;
+}
+
+.company-symbol {
+  color: #00c6ff;
+  margin-left: 8px;
+  display: inline-block;
+}

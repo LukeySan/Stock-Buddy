@@ -1,3 +1,15 @@
+* {
+  margin: 0;
+  padding: 0;
+  box-sizing: border-box;
+}
+
+body {
+  margin: 0;
+  padding: 0;
+  background: linear-gradient(135deg, #1a1a1a 0%, #0a0a0a 100%);
+}
+
 .back-button {
   position: fixed;
   top: 10px;
@@ -59,13 +71,31 @@
   background: linear-gradient(135deg, #1a1a1a 0%, #0a0a0a 100%);
   color: #fff;
   padding: 20px;
+  margin-left: 10%;
+  margin-right: 10%;
 }
 
 .calculator-content {
-  max-width: 600px;
   margin: auto;
   padding: 20px;
   padding-top: 70px;
+}
+
+.stock-calculator-section {
+  margin-bottom: 100vh;
+}
+.service-container {
+  margin-top: 130px;
+  float: left;
+  margin-left: 13%;
+  max-width: 65vh;
+  margin-bottom: 40px;
+  flex: 0 0 auto;
+}
+.service-and-results {
+  position: relative;
+  margin-bottom: 800px;
+  height: 100%;
 }
 
 h1 {
@@ -111,13 +141,18 @@ button:hover {
 }
 
 .results {
+  float: right;
   margin-top: 30px;
   padding: 20px;
-  background: rgba(255, 255, 255, 0.1);
+
   border-radius: 12px;
+  max-width: 65vh;
+  flex: 0 0 auto; /* Add this */
+  height: fit-content; /* Add this */
 }
 
 .results h2 {
+  max-width: 80vh;
   color: #00c6ff;
   margin-bottom: 15px;
   font-size: 1.5rem;
@@ -131,6 +166,8 @@ button:hover {
 
 /* Add a separate container for the explanation */
 .results .explanation {
+  max-width: 80vh;
+
   margin-top: 20px;
   padding: 20px;
   background: rgba(255, 255, 255, 0.1);
@@ -222,9 +259,42 @@ button:hover {
 }
 
 .portfolio-section {
-  margin-top: 40px;
-  padding-top: 20px;
+  padding-top: 80px;
   border-top: 2px solid rgba(255, 255, 255, 0.1);
+  display: flex;
+  gap: 40px;
+}
+
+.portfolio-service-container {
+  margin-top: 200px;
+  margin-left: 13%;
+  max-width: 65vh;
+  margin-bottom: 10px;
+  flex: 0 0 auto;
+}
+
+.portfolio-results-container {
+  float: right;
+  margin-top: 30px;
+  padding: 20px;
+  background: rgba(255, 255, 255, 0.1);
+  border-radius: 12px;
+  max-width: 65vh;
+  flex: 0 0 auto;
+  height: fit-content;
+}
+
+.empty-portfolio-results {
+  background: rgba(255, 255, 255, 0.05);
+  border: 2px dashed rgba(255, 255, 255, 0.1);
+  color: rgba(255, 255, 255, 0.5);
+  text-align: center;
+  padding: 40px;
+  border-radius: 12px;
+  min-height: 300px;
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
 }
 
 .portfolio-section h2 {
@@ -233,6 +303,15 @@ button:hover {
   background: linear-gradient(45deg, #00c6ff, #0072ff);
   -webkit-background-clip: text;
   -webkit-text-fill-color: transparent;
+}
+
+.service-por-result-stuff {
+}
+
+.port-result-and-list {
+}
+
+.port-service {
 }
 
 .portfolio-status,
@@ -277,4 +356,61 @@ button:hover {
   margin-bottom: 10px;
   font-size: 1.1rem;
   line-height: 1.5;
+}
+
+.methodology-explanation {
+  margin-top: 30px;
+  padding: 20px;
+  background: rgba(255, 255, 255, 0.05);
+  border-radius: 12px;
+  border-left: 4px solid #00c6ff;
+}
+
+.methodology-explanation p {
+  color: #fff;
+  margin-bottom: 10px;
+  font-size: 1.1rem;
+  line-height: 1.6;
+  font-family: inherit; /* This will make it easy to change the font later */
+}
+
+.static-risk-math-expanation p {
+  color: white;
+  font-family: "Lexend", sans-serif;
+  border-top: 2px solid rgba(255, 255, 255, 0.1);
+  padding-top: 40px;
+  margin-bottom: 40px;
+  margin-top: 300px;
+  text-indent: 50px;
+  text-align: center;
+}
+
+.static-port-math-expanation p {
+  color: white;
+  font-family: "Lexend", sans-serif;
+  border-top: 2px solid rgba(255, 255, 255, 0.1);
+  padding-top: 40px;
+  margin-bottom: 40px;
+  margin-top: 150px;
+  text-indent: 50px;
+  text-align: center;
+}
+
+.current-portfolio {
+  margin-top: 30px;
+  padding: 20px;
+  background: rgba(255, 255, 255, 0.1);
+  border-radius: 12px;
+}
+
+.current-portfolio h3 {
+  color: #00c6ff;
+  margin-bottom: 15px;
+  font-size: 1.5rem;
+}
+
+.current-portfolio p {
+  color: #fff;
+  margin-bottom: 10px;
+  font-size: 1.1rem;
 }

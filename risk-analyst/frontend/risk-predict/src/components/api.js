@@ -6,6 +6,17 @@ const api = axios.create({
   withCredentials: true, // Important for CSRF
 });
 
+// In api.js
+export const getExplanation = async (data) => {
+  try {
+    const response = await api.post("/api/get-explanation/", data);
+    return response.data.explanation;
+  } catch (error) {
+    console.error("Error getting explanation:", error);
+    throw error;
+  }
+};
+
 // Function to get CSRF token
 export const fetchCSRFToken = async () => {
   try {

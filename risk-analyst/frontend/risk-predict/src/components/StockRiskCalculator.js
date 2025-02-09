@@ -167,16 +167,17 @@ function StockRiskCalculator() {
 
   return (
     <div className="calculator-container">
+      <div className="top-bar">
+        <motion.div 
+          className="top-bar-title"
+          onClick={() => navigate("/")}
+          whileHover={{ x: -2 }}
+          whileTap={{ scale: 0.95 }}
+        >
+          Risk Analyst
+        </motion.div>
+      </div>
       <FinanceBackground />
-      <motion.button
-        onClick={() => navigate("/")}
-        className="back-button"
-        initial={{ x: -100 }}
-        animate={{ x: 0 }}
-        transition={{ type: "spring", stiffness: 50, delay: 0.1 }}
-      >
-        &#x276E;
-      </motion.button>
       <motion.div
         className="calculator-content"
         initial={{ opacity: 0, scale: 0.8 }}

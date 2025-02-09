@@ -1,6 +1,6 @@
 .back-button {
   position: fixed;
-  top: 20px;
+  top: 10px;
   left: 20px;
   background: rgba(255, 255, 255, 0.1);
   border: 1px solid rgba(255, 255, 255, 0.2);
@@ -14,11 +14,43 @@
   align-items: center;
   justify-content: center;
   transition: all 0.3s ease;
+  z-index: 1001;
 }
 
 .back-button:hover {
   background: rgba(255, 255, 255, 0.2);
   transform: translateX(-2px);
+}
+
+.top-bar {
+  position: fixed;
+  top: 0;
+  left: 0;
+  right: 0;
+  height: 60px;
+  background: rgba(26, 26, 26, 0.95);
+  backdrop-filter: blur(10px);
+  display: flex;
+  align-items: center;
+  padding: 0 20px;
+  z-index: 1000;
+  box-shadow: 0 2px 20px rgba(0, 198, 255, 0.1);
+}
+
+.top-bar-title {
+  background: linear-gradient(45deg, #00c6ff, #0072ff);
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+  font-size: 1.5rem;
+  font-weight: bold;
+  margin-left: 20px;
+  cursor: pointer;
+  transition: all 0.3s ease;
+}
+
+.top-bar-title:hover {
+  transform: translateX(-2px);
+  opacity: 0.8;
 }
 
 .calculator-container {
@@ -33,6 +65,7 @@
   max-width: 600px;
   margin: auto;
   padding: 20px;
+  padding-top: 70px;
 }
 
 h1 {

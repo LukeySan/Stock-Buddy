@@ -3,6 +3,7 @@ import { motion } from "framer-motion";
 import { useNavigate } from "react-router-dom";
 import "../styles/WelcomePage.css";
 import GraphAnimation from "./GraphAnimation";
+import FinanceBackground from "./FinanceBackground";
 
 function WelcomePage() {
   const navigate = useNavigate();
@@ -24,6 +25,7 @@ function WelcomePage() {
         exit={{ opacity: 0 }}
         transition={{ duration: 0.5 }}
       >
+        <FinanceBackground />
         <motion.div
           initial={{ y: 20, opacity: 0 }}
           animate={{ y: 0, opacity: 1 }}

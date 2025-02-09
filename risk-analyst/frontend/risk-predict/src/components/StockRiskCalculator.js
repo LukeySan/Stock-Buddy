@@ -123,6 +123,15 @@ function StockRiskCalculator() {
       });
 
       setResult(response.data);
+      const explanationResponse = await api.post("/api/get-explanation/", {
+        stock_symbol: stockSymbol,
+        principle_fund: parseFloat(principleFund),
+        risk: response.data.risk,
+        max_return_dollar: response.data.max_return_dollar,
+        max_loss_dollar: response.data.max_loss_dollar,
+        "5% worst-case scenario": response.data["5% worst-case scenario"],
+      });
+      setExplanation(explanationResponse.data.explanation);
     } catch (error) {
       console.error("Error calculating risk:", error);
     }

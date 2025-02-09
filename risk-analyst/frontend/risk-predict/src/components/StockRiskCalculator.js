@@ -56,10 +56,11 @@ function StockRiskCalculator() {
     if (searchTerm.length >= 2 && companies.length > 0) {
       const fuse = new Fuse(companies, {
         keys: ["Security", "Symbol"],
-        threshold: 0.3,
-        distance: 100,
+        threshold: 0.0,  // Make the match exact
+        distance: 0,     // Don't allow character distance
         minMatchCharLength: 2,
         includeScore: true,
+        useExtendedSearch: true  // Enable extended search
       });
 
       const searchResults = fuse.search(searchTerm);
@@ -79,7 +80,7 @@ function StockRiskCalculator() {
     setSelectedCompany(company);
     setStockSymbol(company.Symbol);
     setSearchTerm(company.Symbol);
-    setResults([]);
+    // Don't blur or clear results here - let the onBlur handler do it
   };
 
   function getCookie(name) {
@@ -156,6 +157,10 @@ function StockRiskCalculator() {
             placeholder="Search company or symbol"
             value={searchTerm}
             onChange={(e) => setSearchTerm(e.target.value)}
+            onBlur={() => {
+              // Small delay to allow click event to fire first
+              setTimeout(() => setResults([]), 200);
+            }}
           />
           {results.length > 0 && (
             <ul className="search-results">

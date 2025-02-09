@@ -9,9 +9,13 @@ from scipy.stats import norm
 import pandas as pd
 import openai
 import risk_calculator.utils as util
+from dotenv import load_dotenv
+import os
+
+load_dotenv()
 
 #Define view functions or classes that handle HTTP requests.
-openai.api_key = "sk-5Ps5q8qhZJZi51WIy_ypsxW13FgaKIm3ZR-SUd8YC6T3BlbkFJiddVNMRrAysEA-0hGZ0vrpBeO0rYw4K65bjIuAsBoA" 
+openai.api_key = os.getenv("OPENAI_API_KEY")
 
 
 # Create your views here.

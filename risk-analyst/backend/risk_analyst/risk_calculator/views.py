@@ -20,12 +20,52 @@ openai.api_key = os.getenv("OPENAI_API_KEY")
 
 # Create your views here.
 
+class GetPortfolioAnalysisView(View):
+    def post(self, request):
+        try:
+            prompt = """ You are a professional value trading consultant bot specializing in investment risk analytics. Your task is to analyze an investment based on the following JSON data and provide an evaluation with clear, actionable insights. Your response should include: 1. Risk Analysis: Evaluate the portfolio's risk percentage and explain its implications. 2. Max Return & Max Loss: Clearly define the potential profit and downside. 3. Value at Risk (VaR): Estimate the expected loss in extreme conditions using the Monte Carlo 5% worst-case scenario. 4. Monte Carlo Interpretation: Explain what this scenario means in percentage terms and dynamically calculate the corresponding dollar loss based on the principal fund (note that the Monte Carlo value represents the amount left in the portfolio, not the amount lost). 5. Investor Suitability: Identify what type of investor would benefit most from this portfolio based on its risk/reward profile. 6. Risk Management Recommendations: Offer specific strategies (e.g., diversification, stop-loss orders, portfolio allocation adjustments) to manage potential losses. Your response must be concise (max 300 words), structured in one paragraph, and free from greetings or follow-up questions. Avoid vague statements and ensure your analysis is precise and actionable."""
+            messages = [{"role": "system", "content": prompt}]
+            portfolio = json.loads(request.body)
+            prompt += (f"""
+            Portfolio Composition and Weights:
+            {', '.join([f'{ticker}: {weight*100:.1f}%' for ticker, weight in portfolio['weights'].items()])}
+            
+            Total Investment: ${portfolio['total_investment']:,.2f}
+            
+            Risk Analysis:
+            - Portfolio Volatility: {portfolio['portfolio_risk']['Total Portfolio Volatility (Risk)']*100:.2f}%
+            - 5% Worst Case Scenario: ${portfolio['portfolio_risk']['5% Worst Case Scenario (Monte Carlo)']:,.2f}
+            - Potential Loss: ${portfolio['total_investment'] - portfolio['portfolio_risk']['5% Worst Case Scenario (Monte Carlo)']:,.2f}
+            """)
+
+            messages.append({"role": "user", "content": prompt})
+
+            response = openai.ChatCompletion.create(
+                model = "gpt-3.5-turbo",
+                messages = messages,
+                max_tokens = 300,
+                temperature = 0.5
+            )
+            explanation = response["choices"][0]["message"]["content"].strip()
+            return JsonResponse({'explanation': explanation})
+        except Exception as e:
+            return JsonResponse({'error': str(e)}, status=400)
+            
+
 class GetExplanationView(View):
     def post(self, request):
         try:
-            prompt = "You are a professional value trading consultant bot that evaluates an investment takeaway based on the data provided in the prompt. "
-            "The prompt will have data that includes a percent risk of investing in that stock, the max return in dollars, max loss in dollars, the return percentage in the worst 5 percent of simulated cases, the stock symbol and the prinicple fund that the user inputed." 
-            "In your response cannot be more than 300 words. Your response should be formatted as just one paragraph and you must not greet the user, or have any follow up questoins after your evaluation. You must not use any emojis in your response."
+            prompt = """You are a professional value trading consultant bot specializing in investment risk analytics. Your task is to analyze an investment based on the given data and provide an evaluation with clear, actionable insights.
+
+Your response should include:
+1. **Risk Analysis:** Evaluate the stock's risk percentage and explain its implications.
+2. **Max Return & Max Loss:** Clearly define the potential profit and downside.
+3. **Value at Risk (VaR):** Estimate the expected loss in extreme conditions using the Monte Carlo 5% worst-case scenario.
+4. **Monte Carlo Interpretation:** Explain what this scenario means in **percentage terms** and dynamically calculate the **corresponding dollar loss** based on the principal fund.
+5. **Investor Suitability:** Identify what type of investor would benefit most from this stock, based on the risk/reward profile.
+6. **Risk Management Recommendations:** Offer specific strategies (e.g., diversification, stop-loss orders, portfolio allocation) to manage potential losses.
+
+Your response must be **concise (max 300 words), structured in one paragraph, and free from greetings or follow-up questions**. Do not use any emojis. Ensure your analysis is precise and actionable, avoiding vague statements."""
             messages = [{"role": "system", "content": prompt}]
             
             
@@ -39,6 +79,7 @@ class GetExplanationView(View):
             5% Worst Case Scenario (Calculated from Monte Carlo Simulation): {data.get('5% worst-case scenario')}
             """)
             messages.append({"role": "user", "content": prompt})
+            #TODO make sure to add name of stock company in the prompt so that it uses its company in the response instead of the symbol
 
             response = openai.ChatCompletion.create(
                 model = "gpt-3.5-turbo",
@@ -51,7 +92,98 @@ class GetExplanationView(View):
           
         except Exception as e:
             return JsonResponse({'error': str(e)}, status=400)
-   
+        
+class CalculatePortfolioAnalysisView(View):
+    def post(self, request):
+        try:
+            portfolio= json.loads(request.body)
+
+            #Extract tickeres and investments from the portfolio data
+            tickers = list(portfolio.keys())
+            investments = np.array(list(portfolio.values()))
+            total_investment = np.sum(investments)
+
+            #Computer portfolio weights based on investment amounts
+            weights = investments / total_investment #Normalized weights
+            portfolio_data = yf.download(tickers, period='1y')
+            if portfolio_data.empty:
+                return JsonResponse({'error': 'No data found for the given tickers'}, status=404)
+
+            #Calculate daily log returns
+            log_returns = np.log(portfolio_data['Close'] / portfolio_data['Close'].shift(1).dropna())
+            log_returns = log_returns.dropna()
+
+            if log_returns.empty:
+                return JsonResponse({'error': 'Insufficient data for analysis'}, status=400)
+
+            #Compute Volatility for each stock
+            garch_volatilities = {}
+
+            #for ticker in tickers:
+                #garch_volatilities[ticker] = util.get_forecast_volatility(log_returns[ticker])
+
+            for ticker in tickers:
+                returns = log_returns[ticker].replace([np.inf, -np.inf], np.nan).dropna()
+                if len(returns) < 2:  # Need at least 2 points for volatility
+                    return JsonResponse({'error': f'Insufficient data for {ticker}'}, status=400)
+                garch_volatilities[ticker] = util.get_forecast_volatility(returns)
+
+            #Convert to NumPy array 
+            volatilities = np.array([garch_volatilities[ticker] for ticker in tickers])
+            # Check for valid volatilities
+            if np.any(np.isnan(volatilities)) or np.any(np.isinf(volatilities)):
+                return JsonResponse({'error': 'Invalid volatility calculations'}, status=400)
+
+            #Compute Portfolio Volatility (Total Risk) using Covariance Matrix
+            cov_matrix = log_returns.cov() * 252
+            portfolio_variance = np.dot(weights.T, np.dot(cov_matrix, weights))
+            portfolio_volatility = np.sqrt(portfolio_variance)
+            
+            #Monte Carlo Simulation for Portfolio Value
+            num_simulations = 10000
+            num_days = 252  # One trading year
+            dt = 1/252  # Daily time step
+
+            portfolio_values = np.zeros((num_days, num_simulations))
+            portfolio_values[0] = total_investment
+
+            # Annual to daily conversion for mean returns
+            daily_returns_mean = log_returns.mean() * dt
+            daily_volatilities = volatilities * np.sqrt(dt)
+
+            corr_matrix = log_returns.corr()
+            L = np.linalg.cholesky(corr_matrix)
+
+            for t in range(1, num_days):
+                z = np.random.standard_normal((len(tickers), num_simulations))
+                correlated_z = np.dot(L, z)  # Apply correlations
+
+                simulated_returns = np.exp(
+                    (daily_returns_mean.values.reshape(-1, 1) - 0.5 * daily_volatilities.reshape(-1, 1)**2) + 
+                    daily_volatilities.reshape(-1, 1) * correlated_z
+                )
+                weighted_returns = np.sum(weights.reshape(-1, 1) * simulated_returns, axis=0)
+                portfolio_values[t] = portfolio_values[t-1] * weighted_returns
+
+            #Compute Portfolio Monte Carlo 5% Worst Case
+            percentile_5 = np.percentile(portfolio_values[-1], 5)
+
+            portfolio_risk_results = pd.DataFrame({
+                "Total Portfolio Volatility (Risk)": [portfolio_volatility],
+                "5% Worst Case Scenario (Monte Carlo)": [percentile_5]
+            })
+
+            # Convert DataFrame to dictionary and return as JSON
+            final_result = {
+                "portfolio_risk": portfolio_risk_results.to_dict('records')[0],
+                "total_investment": float(total_investment),
+                "weights": {ticker: float(weight) for ticker, weight in zip(tickers, weights)}
+            }
+
+            return JsonResponse(final_result)
+
+        except Exception as e:
+            return JsonResponse({'error': str(e)}, status=400)
 
 class GetCSRFTokenView(View):
      def get(self, request):

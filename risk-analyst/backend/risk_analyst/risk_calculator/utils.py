@@ -9,3 +9,4 @@ def get_forecast_volatility(ret):
 
     forecast_volatility = np.sqrt(garch_result.forecast(start = 0).variance.iloc[-1,0])/100
     return forecast_volatility
+

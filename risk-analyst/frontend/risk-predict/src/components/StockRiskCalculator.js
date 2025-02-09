@@ -10,6 +10,19 @@ import api, { fetchCSRFToken } from "./api";
 import FinanceBackground from './FinanceBackground';
 import '../styles/FinanceBackground.css';
 
+const contentVariants = {
+  hidden: { opacity: 0, scale: 0.8 },
+  visible: { 
+    opacity: 1, 
+    scale: 1,
+    transition: {
+      duration: 1,
+      ease: [0.43, 0.13, 0.23, 0.96]
+    }
+  },
+  exit: { opacity: 0, scale: 0.8 }
+};
+
 function StockRiskCalculator() {
   const [companies, setCompanies] = useState([]);
   const [searchTerm, setSearchTerm] = useState("");
@@ -121,10 +134,10 @@ function StockRiskCalculator() {
       </motion.button>
       <motion.div
         className="calculator-content"
-        initial={{ x: "100vw" }}
-        animate={{ x: 0 }}
-        exit={{ x: "100vw" }}
-        transition={{ type: "spring", stiffness: 50 }}
+        variants={contentVariants}
+        initial="hidden"
+        animate="visible"
+        exit="exit"
       >
         <h1>Stock Risk Calculator</h1>
         <input

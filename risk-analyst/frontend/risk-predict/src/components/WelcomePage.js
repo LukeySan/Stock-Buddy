@@ -31,8 +31,8 @@ function WelcomePage() {
           animate={{ y: 0, opacity: 1 }}
           transition={{ delay: 0.2 }}
         >
-          <h1>Welcome</h1>
-          <p>Integrate our API for comprehensive analytics.</p>
+          <h1>Stock Buddy</h1>
+          <p>Welcome to Stock Buddy, your personal stock advisor!</p>
           <motion.button
             className="connect-button"
             onClick={handleClick}

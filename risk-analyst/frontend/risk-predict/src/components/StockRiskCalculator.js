@@ -45,21 +45,21 @@ function StockRiskCalculator() {
   const navigate = useNavigate();
 
   const handleAddToPortfolio = () => {
-    if (!stockSymbol || !principleFund) {
+    if (!portfolioStockSymbol || !portfolioPrincipleFund) {
       alert("Please select a stock and enter principle fund");
       return;
     }
 
     setPortfolio((prev) => ({
       ...prev,
-      [stockSymbol]: parseFloat(principleFund),
+      [portfolioStockSymbol]: parseFloat(portfolioPrincipleFund),
     }));
 
-    // Clear inputs after adding
-    setStockSymbol("");
-    setPrincipleFund("");
-    setSearchTerm("");
-    setSelectedCompany(null);
+    // Clear portfolio inputs after adding
+    setPortfolioStockSymbol("");
+    setPortfolioPrincipleFund("");
+    setPortfolioSearchTerm("");
+    setPortfolioSelectedCompany(null);
   };
   const handleAnalyzePortfolio = async () => {
     if (Object.keys(portfolio).length < 2) {
@@ -194,6 +194,12 @@ function StockRiskCalculator() {
     }
   };
 
+  const handlePortfolioCompanySelect = (company) => {
+    setPortfolioSelectedCompany(company);
+    setPortfolioStockSymbol(company.Symbol);
+    setPortfolioSearchTerm(company.Symbol);
+  };
+
   return (
     <div className="calculator-container">
       <div className="top-bar">
@@ -203,7 +209,7 @@ function StockRiskCalculator() {
           whileHover={{ x: -2 }}
           whileTap={{ scale: 0.95 }}
         >
-          Risk Analyst
+          Stock Buddy
         </motion.div>
       </div>
       <FinanceBackground />
@@ -217,118 +223,111 @@ function StockRiskCalculator() {
           ease: [0.43, 0.13, 0.23, 0.96], // Custom easing for a nice pop effect
         }}
       >
-        <h1>Stock Risk Calculator</h1>
-        <div className="search-container">
-          <input
-            type="text"
-            placeholder="Search company or symbol"
-            value={searchTerm}
-            onChange={(e) => setSearchTerm(e.target.value)}
-            onBlur={() => {
-              setTimeout(() => setMainSearchResults([]), 200);
-            }}
-          />
-          {mainSearchResults.length > 0 && (
-            <ul className="search-results">
-              {mainSearchResults.map((company) => (
-                <li
-                  key={company.Symbol}
-                  onClick={() => handleSelectCompany(company)}
-                >
-                  <span className="company-name">{company.Security}</span>
-                  <span className="company-symbol">({company.Symbol})</span>
-                </li>
-              ))}
-            </ul>
+        <div className="service-and-results">
+          <div className="service-container">
+            <h1>Stock Risk Calculator</h1>
+            <div className="search-container">
+              <input
+                type="text"
+                placeholder="Search company or symbol"
+                value={searchTerm}
+                onChange={(e) => setSearchTerm(e.target.value)}
+                onBlur={() => {
+                  setTimeout(() => setMainSearchResults([]), 200);
+                }}
+              />
+              {mainSearchResults.length > 0 && (
+                <ul className="search-results">
+                  {mainSearchResults.map((company) => (
+                    <li
+                      key={company.Symbol}
+                      onClick={() => handleSelectCompany(company)}
+                    >
+                      <span className="company-name">{company.Security}</span>
+                      <span className="company-symbol">({company.Symbol})</span>
+                    </li>
+                  ))}
+                </ul>
+              )}
+            </div>
+            <input
+              type="number"
+              value={principleFund}
+              onChange={(e) => setPrincipleFund(e.target.value)}
+              placeholder="Enter principle fund"
+            />
+            <button onClick={handleCalculateRisk}>Calculate Risk</button>
+          </div>
+
+          {result && (
+            <>
+              <div className="results">
+                <h2>Results:</h2>
+                <p>Risk: {result.risk}%</p>
+                <p>Max Return: ${result.max_return_dollar}</p>
+                <p>Max Loss: ${result.max_loss_dollar}</p>
+                <p>Value at Risk: {result["5% worst-case scenario"]}%</p>
+
+                {explanation && (
+                  <div className="explanation">
+                    <h4>AI Analysis:</h4>
+                    <p>{explanation}</p>
+                  </div>
+                )}
+              </div>
+            </>
           )}
         </div>
-        <input
-          type="number"
-          value={principleFund}
-          onChange={(e) => setPrincipleFund(e.target.value)}
-          placeholder="Enter principle fund"
-        />
-        <button onClick={handleCalculateRisk}>Calculate Risk</button>
-
-        {result && (
-          <div className="results">
-            <h2>Results:</h2>
-            <p>Risk: {result.risk}%</p>
-            <p>Max Return: ${result.max_return_dollar}</p>
-            <p>Max Loss: ${result.max_loss_dollar}</p>
-            <p>Value at Risk: {result["5% worst-case scenario"]}%</p>
-
-            {explanation && (
-              <div className="explanation">
-                <h4>AI Analysis:</h4>
-                <p>{explanation}</p>
-              </div>
-            )}
-          </div>
-        )}
-
+        <div className="static-risk-math-expanation">
+          <p>
+            Stock Buddy combines two approaches. First, we estimate future
+            volatility using GARCH, which uses historical data to predict
+            real-time volatility of the stock. This volatility estimate feeds
+            into our Monte Carlo simulation, which generates 10,000 potential
+            future price paths across trading days. Rather than assuming fixed
+            returns and risk, this captures real market uncertainty through
+            random variations. For risk assessment, we examine the 5% worst case
+            scenario - the outcomes falling within the lowest 5% of all
+            simulated possibilities - enabling investors to evaluate positions
+            based on their risk tolerance.
+          </p>
+        </div>
         <div className="portfolio-section">
-          <h2>Portfolio Analysis</h2>
-
-          <div className="search-container">
+          <div className="portfolio-service-container">
+            <h2>Portfolio Analysis</h2>
+            <div className="search-container">
+              <input
+                type="text"
+                placeholder="Search company or symbol for portfolio"
+                value={portfolioSearchTerm}
+                onChange={(e) => setPortfolioSearchTerm(e.target.value)}
+                onBlur={() => {
+                  setTimeout(() => setPortfolioSearchResults([]), 200);
+                }}
+              />
+              {portfolioSearchResults.length > 0 && (
+                <ul className="search-results">
+                  {portfolioSearchResults.map((company) => (
+                    <li
+                      key={company.Symbol}
+                      onClick={() => handlePortfolioCompanySelect(company)}
+                    >
+                      <span className="company-name">{company.Security}</span>
+                      <span className="company-symbol">({company.Symbol})</span>
+                    </li>
+                  ))}
+                </ul>
+              )}
+            </div>
             <input
-              type="text"
-              placeholder="Search company or symbol for portfolio"
-              value={portfolioSearchTerm}
-              onChange={(e) => setPortfolioSearchTerm(e.target.value)}
-              onBlur={() => {
-                setTimeout(() => setPortfolioSearchResults([]), 200);
-              }}
+              type="number"
+              value={portfolioPrincipleFund}
+              onChange={(e) => setPortfolioPrincipleFund(e.target.value)}
+              placeholder="Enter principle fund for portfolio"
             />
-            {portfolioSearchResults.length > 0 && (
-              <ul className="search-results">
-                {portfolioSearchResults.map((company) => (
-                  <li
-                    key={company.Symbol}
-                    onClick={() => {
-                      setPortfolioSelectedCompany(company);
-                      setPortfolioStockSymbol(company.Symbol);
-                      setPortfolioSearchTerm(company.Symbol);
-                    }}
-                  >
-                    <span className="company-name">{company.Security}</span>
-                    <span className="company-symbol">({company.Symbol})</span>
-                  </li>
-                ))}
-              </ul>
-            )}
-          </div>
+            <button onClick={handleAddToPortfolio}>Add to Portfolio</button>
 
-          <input
-            type="number"
-            value={portfolioPrincipleFund}
-            onChange={(e) => setPortfolioPrincipleFund(e.target.value)}
-            placeholder="Enter principle fund for portfolio"
-          />
-
-          <button
-            onClick={() => {
-              if (!portfolioStockSymbol || !portfolioPrincipleFund) {
-                alert(
-                  "Please select a stock and enter principle fund for portfolio"
-                );
-                return;
-              }
-              setPortfolio((prev) => ({
-                ...prev,
-                [portfolioStockSymbol]: parseFloat(portfolioPrincipleFund),
-              }));
-              setPortfolioStockSymbol("");
-              setPortfolioPrincipleFund("");
-              setPortfolioSearchTerm("");
-              setPortfolioSelectedCompany(null);
-            }}
-          >
-            Add to Portfolio
-          </button>
-
-          {Object.keys(portfolio).length > 0 && (
-            <div className="portfolio-status">
+            <div className="current-portfolio">
               <h3>Current Portfolio:</h3>
               {Object.entries(portfolio).map(([symbol, amount]) => (
                 <p key={symbol}>
@@ -341,45 +340,70 @@ function StockRiskCalculator() {
                 </button>
               )}
             </div>
-          )}
+          </div>
 
-          {portfolioResult && (
-            <div className="portfolio-results">
-              <h3>Portfolio Analysis Results:</h3>
-              <p>
-                Portfolio Risk:{" "}
-                {(
-                  portfolioResult.portfolio_risk[
-                    "Total Portfolio Volatility (Risk)"
-                  ] * 100
-                ).toFixed(2)}
-                %
-              </p>
-              <p>
-                5% Worst Case Value: $
-                {portfolioResult.portfolio_risk[
-                  "5% Worst Case Scenario (Monte Carlo)"
-                ].toFixed(2)}
-              </p>
-              <p>
-                Total Investment: ${portfolioResult.total_investment.toFixed(2)}
-              </p>
-              <h4>Portfolio Weights:</h4>
-              {Object.entries(portfolioResult.weights).map(
-                ([symbol, weight]) => (
-                  <p key={symbol}>
-                    {symbol}: {(weight * 100).toFixed(2)}%
+          <div className="portfolio-results-container">
+            {portfolioResult ? (
+              <>
+                <div className="portfolio-results">
+                  <h3>Portfolio Analysis Results:</h3>
+                  <p>
+                    Portfolio Risk:{" "}
+                    {(
+                      portfolioResult.portfolio_risk[
+                        "Total Portfolio Volatility (Risk)"
+                      ] * 100
+                    ).toFixed(2)}
+                    %
                   </p>
-                )
-              )}
-              {portfolioExplanation && (
-                <div className="portfolio-explanation">
-                  <h4>AI Analysis:</h4>
-                  <p>{portfolioExplanation}</p>
+                  <p>
+                    5% Worst Case Value: $
+                    {portfolioResult.portfolio_risk[
+                      "5% Worst Case Scenario (Monte Carlo)"
+                    ].toFixed(2)}
+                  </p>
+                  <p>
+                    Total Investment: $
+                    {portfolioResult.total_investment.toFixed(2)}
+                  </p>
+                  <h4>Portfolio Weights:</h4>
+                  {Object.entries(portfolioResult.weights).map(
+                    ([symbol, weight]) => (
+                      <p key={symbol}>
+                        {symbol}: {(weight * 100).toFixed(2)}%
+                      </p>
+                    )
+                  )}
+                  {portfolioExplanation && (
+                    <div className="portfolio-explanation">
+                      <h4>AI Analysis:</h4>
+                      <p>{portfolioExplanation}</p>
+                    </div>
+                  )}
                 </div>
-              )}
-            </div>
-          )}
+              </>
+            ) : (
+              <div className="empty-portfolio-results">
+                <h2>Portfolio results will appear here</h2>
+                <p>Add stocks to your portfolio to see the analysis</p>
+              </div>
+            )}
+          </div>
+        </div>
+        <div className="static-port-math-expanation">
+          <p>
+            Stock buddy extends the individual stock prediction approach by
+            incorporating the correlation matrix. While GARCH estimates each
+            stock's volatility and Monte Carlo simulations generate potential
+            price paths, the correlation matrix accounts for interdependencies
+            between assets. This enhances the accuracy of the portfolio's risk
+            estimation by reflecting the stocks' price paths relative to one
+            another, and comparing their industry sector. By integrating these
+            relationships into the colleration matrix, we refine the Monte Carlo
+            simulation, providing a more robust measure of total portfolio
+            volatility and the 5% worst-case scenario for informed risk
+            assessment.
+          </p>
         </div>
       </motion.div>
     </div>

@@ -23,9 +23,20 @@ openai.api_key = os.getenv("OPENAI_API_KEY")
 class GetExplanationView(View):
     def post(self, request):
         try:
-            prompt = "You are a professional value trading consultant bot that evaluates an investment takeaway based on the data provided in the prompt. "
-            "The prompt will have data that includes a percent risk of investing in that stock, the max return in dollars, max loss in dollars, the return percentage in the worst 5 percent of simulated cases, the stock symbol and the prinicple fund that the user inputed." 
-            "In your response cannot be more than 300 words. Your response should be formatted as just one paragraph and you must not greet the user, or have any follow up questoins after your evaluation. You must not use any emojis in your response."
+            prompt = """You are a professional value trading consultant bot specializing in investment risk analytics. Your task is to analyze an investment based on the given data and provide an evaluation with clear, actionable insights.
+
+Your response should include:
+1. **Risk Analysis:** Evaluate the stock's risk percentage and explain its implications.
+2. **Max Return & Max Loss:** Clearly define the potential profit and downside.
+3. **Value at Risk (VaR):** Estimate the expected loss in extreme conditions using the Monte Carlo 5% worst-case scenario.
+4. **Monte Carlo Interpretation:** Explain what this scenario means in dollar terms for the investor.
+5. **Investor Suitability:** Identify what type of investor would benefit most from this stock, based on the risk/reward profile.
+6. **Risk Management Recommendations:** Offer specific strategies (e.g., diversification, stop-loss orders, portfolio allocation) to manage potential losses.
+
+Your response must be **concise (max 300 words), structured in one paragraph, and free from greetings or follow-up questions**. Do not use any emojis. Ensure your analysis is precise and actionable, avoiding vague statements.
+
+Stock Data:
+"""
             messages = [{"role": "system", "content": prompt}]
             
             
@@ -39,6 +50,7 @@ class GetExplanationView(View):
             5% Worst Case Scenario (Calculated from Monte Carlo Simulation): {data.get('5% worst-case scenario')}
             """)
             messages.append({"role": "user", "content": prompt})
+            #TODO make sure to add name of stock company in the prompt so that it uses its company in the response instead of the symbol
 
             response = openai.ChatCompletion.create(
                 model = "gpt-3.5-turbo",

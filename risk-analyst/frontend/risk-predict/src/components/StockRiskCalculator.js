@@ -47,6 +47,12 @@ function StockRiskCalculator() {
     setResults(results.map((result) => result.item)); // Extract matched items
   }, [searchTerm, companies]);
 
+  useEffect(() => {
+    if (result) {
+      handleGenerateExplanation();
+    }
+  }, [result]);
+
   const handleSelectCompany = (company) => {
     setSelectedCompany(company);
     setStockSymbol(company.Symbol); // Set the stock symbol based on the selected company
@@ -94,38 +100,35 @@ function StockRiskCalculator() {
       });
 
       setResult(response.data);
-      handleGenerateExplanation(result);
     } catch (error) {
       console.error("Error calculating risk:", error);
     }
   };
 
   return (
-    <div style={{ position: "relative" }}>
+    <div className="calculator-container">
       <motion.button
         onClick={() => navigate("/")}
         className="back-button"
         initial={{ x: -100 }}
         animate={{ x: 0 }}
         transition={{ type: "spring", stiffness: 50, delay: 0.1 }}
-        style={{ position: "fixed", top: "20px", left: "20px" }}
       >
         &#x276E;
       </motion.button>
       <motion.div
+        className="calculator-content"
         initial={{ x: "100vw" }}
         animate={{ x: 0 }}
         exit={{ x: "100vw" }}
         transition={{ type: "spring", stiffness: 50 }}
-        style={{ padding: "20px", maxWidth: "600px", margin: "auto" }}
       >
         <h1>Stock Risk Calculator</h1>
         <input
           type="text"
-          placeholder="Enter Symbol"
-          value={stockSymbol}
-          onChange={(e) => setStockSymbol(e.target.value)}
-          style={{ padding: "10px", width: "100%", marginBottom: "10px" }}
+          placeholder="Search company or symbol"
+          value={searchTerm}
+          onChange={(e) => setSearchTerm(e.target.value)}
         />
         {results.length > 0 && (
           <ul>
@@ -144,18 +147,13 @@ function StockRiskCalculator() {
           value={principleFund}
           onChange={(e) => setPrincipleFund(e.target.value)}
           placeholder="Enter principle fund"
-          style={{ padding: "10px", width: "100%", marginBottom: "10px" }}
         />
-        <button
-          onClick={handleCalculateRisk}
-          //disabled={!stockSymbol}
-          style={{ padding: "10px", width: "100%", marginBottom: "10px" }}
-        >
+        <button onClick={handleCalculateRisk}>
           Calculate Risk
         </button>
 
         {result && (
-          <div style={{ marginTop: "20px" }}>
+          <div className="results">
             <h2>Results:</h2>
             <p>Risk: {result.risk}%</p>
             <p>Max Return: ${result.max_return_dollar}</p>

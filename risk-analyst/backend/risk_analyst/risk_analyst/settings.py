@@ -25,12 +25,13 @@ BASE_DIR = Path(__file__).resolve().parent.parent
 SECRET_KEY = os.getenv("DJANGO_SECRET_KEY")
 
 # SECURITY WARNING: don't run with debug turned on in production!
-DEBUG = True
+DEBUG = os.getenv('DEBUG', 'False') == 'True'
+#DEBUG = True
 
 # Add this after your CORS_ALLOWED_ORIGINS setting
 CORS_ALLOW_CREDENTIALS = True
 
-ALLOWED_HOSTS = []
+ALLOWED_HOSTS = ['localhost', '127.0.0.1', 'your-render-app.onrender.com']
 
 
 # Application definition
@@ -64,10 +65,14 @@ MIDDLEWARE = [
 
 CORS_ALLOWED_ORIGINS = [
        "http://localhost:3000",
+       "https://your-frontend-domain.netlify.app"
+
    ]
 
 CSRF_TRUSTED_ORIGINS = [
        'http://localhost:3000',
+       'https://your-frontend-domain.netlify.app'
+
    ]
 
 ROOT_URLCONF = 'risk_analyst.urls'

@@ -1,3 +1,4 @@
+#!/usr/bin/env bash
 pip install -r requirements.txt
-
-python manage.py collectstatic --no-input
+cd risk_analyst
+python3 manage.py collectstatic --no-input

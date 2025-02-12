@@ -13,6 +13,7 @@ const api = axios.create({
 // Add an interceptor to handle CSRF token
 api.interceptors.request.use(
   (config) => {
+    // Get CSRF token from cookie
     const csrfToken = document.cookie
       .split("; ")
       .find((row) => row.startsWith("csrftoken="))

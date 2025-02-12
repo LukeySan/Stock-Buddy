@@ -85,11 +85,6 @@ function StockRiskCalculator() {
   };
 
   useEffect(() => {
-    // Fetch CSRF token when component mounts
-    fetchCSRFToken();
-  }, []);
-
-  useEffect(() => {
     const fetchCompanies = async () => {
       try {
         const response = await axios.get("/sp500_companies.json");

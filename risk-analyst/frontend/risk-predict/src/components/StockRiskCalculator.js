@@ -174,8 +174,6 @@ function StockRiskCalculator() {
 
   const handleCalculateRisk = async () => {
     try {
-      await api.get("/api/csrf-token/");
-
       const response = await api.post("/api/calculate-risk/", {
         symbol: stockSymbol,
         principle_fund: parseFloat(principleFund),

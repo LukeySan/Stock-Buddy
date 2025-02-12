@@ -43,7 +43,7 @@ export const getExplanation = async (data) => {
 export const fetchCSRFToken = async () => {
   try {
     const response = await api.get("/api/get-csrf-token/");
-    api.defaults.headers.common["X-CSRFToken"] = response.data.csrfToken;
+    return response.data.csrfToken;
   } catch (error) {
     console.error("Error fetching CSRF token:", error);
   }

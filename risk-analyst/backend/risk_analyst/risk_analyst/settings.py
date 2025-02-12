@@ -67,14 +67,14 @@ MIDDLEWARE = [
 
 CORS_ALLOWED_ORIGINS = [
        "http://localhost:3000",
-       "https://your-frontend-domain.netlify.app",
+       "https://stock-buddy.netlify.appp",
        "https://stock-buddy.onrender.com"
 
    ]
 
 CSRF_TRUSTED_ORIGINS = [
        'http://localhost:3000',
-       'https://your-frontend-domain.netlify.app',
+       'https://stock-buddy.netlify.app',
        'https://stock-buddy.onrender.com'
 
    ]

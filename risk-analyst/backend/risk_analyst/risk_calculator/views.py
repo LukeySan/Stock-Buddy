@@ -189,7 +189,9 @@ class CalculatePortfolioAnalysisView(View):
 class GetCSRFTokenView(View):
      def get(self, request):
         try:
-            response = JsonResponse({'csrfToken': get_token(request)})
+            csrf_token = get_token(request)
+            response = JsonResponse({'csrfToken': csrf_token})
+            response["Access-Control-Allow-Origin"] = "https://stock-buddy.netlify.app"
             response["Access-Control-Allow-Credentials"] = "true"
             return response
         except Exception as e:

@@ -14,6 +14,9 @@ from pathlib import Path
 from dotenv import load_dotenv
 import os
 
+# Load environment variables
+load_dotenv()
+
 # Build paths inside the project like this: BASE_DIR / 'subdir'.
 BASE_DIR = Path(__file__).resolve().parent.parent
 
@@ -23,11 +26,11 @@ BASE_DIR = Path(__file__).resolve().parent.parent
 # See https://docs.djangoproject.com/en/4.2/howto/deployment/checklist/
 
 # SECURITY WARNING: keep the secret key used in production secret!
-SECRET_KEY = os.getenv("DJANGO_SECRET_KEY")
+SECRET_KEY = os.getenv("DJANGO_SECRET_KEY", 'django-insecure-default-dev-key-change-in-production')
 
 # SECURITY WARNING: don't run with debug turned on in production!
 DEBUG = os.getenv('DEBUG', 'False') == 'True'
-#DEBUG = True
+
 
 # Add this after your CORS_ALLOWED_ORIGINS setting
 CORS_ALLOW_CREDENTIALS = True
@@ -79,8 +82,11 @@ CSRF_TRUSTED_ORIGINS = [
    ]
 
 CSRF_COOKIE_SAMESITE = 'None'
-CSRF_COOKIE_SECURE = True
+
 SESSION_COOKIE_SAMESITE = 'None'
+
+
+CSRF_COOKIE_SECURE = True    
 SESSION_COOKIE_SECURE = True
 
 ROOT_URLCONF = 'risk_analyst.urls'
